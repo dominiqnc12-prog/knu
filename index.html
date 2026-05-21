@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knu Element - Host Stand Display Generator</title>
+    <!-- Tailwind CSS for clean layout styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <!-- html2canvas to export perfect high-res PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0b0b0b;
+            color: #f5f5f7;
+        }
+        /* Custom scrollbar for control panel */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121212;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+        /* Premium Ambient Pulsing Silver Glow behind QR code */
+        @keyframes subtlePulse {
+            0% {
+                transform: scale(0.92);
+                opacity: 0.25;
+                filter: blur(40px);
+            }
+            50% {
+                transform: scale(1.15);
+                opacity: 0.45;
+                filter: blur(60px);
+            }
+            100% {
+                transform: scale(0.92);
+                opacity: 0.25;
+                filter: blur(40px);
+            }
+        }
+        .ambient-glow {
+            background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.03) 50%, rgba(0,0,0,0) 70%);
+            animation: subtlePulse 7s infinite ease-in-out;
+        }
+        /* Spacing and borders */
+        .letter-spacing-custom {
+            letter-spacing: 0.22em;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+
+    <!-- CONTROL PANEL (Left Side) -->
+    <div id="controlPanel" class="w-full md:w-5/12 lg:w-4/12 bg-[#121212] border-b md:border-b-0 md:border-r border-[#222] p-6 md:p-8 flex flex-col justify-between shrink-0 z-10">
+        <div>
+            <!-- Header -->
+            <div class="mb-8">
+                <span class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 block mb-1">Knu Element Productions</span>
+                <h1 class="text-xl md:text-2xl font-light tracking-tight text-white">Tablet Display Studio</h1>
+                <p class="text-xs text-gray-400 mt-2">Generate a pixel-perfect dark-luxury visual for your host stand kiosk.</p>
+            </div>
+
+            <!-- Configuration Form -->
+            <div class="space-y-6">
+                <!-- Logo Upload -->
+                <div>
+                    <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-2">1. Your Brand Logo</label>
+                    <div class="relative border border-dashed border-[#333] hover:border-[#555] rounded-lg p-4 transition-all duration-200 bg-[#161616] cursor-pointer">
+                        <input type="file" id="logoUpload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <div class="text-center">
+                            <span id="logoStatus" class="text-xs text-gray-400">Drag & drop or Click to upload Logo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Code Upload -->
+                <div>
+                    <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-2">2. Your Custom QR Code</label>
+                    <div class="relative border border-dashed border-[#333] hover:border-[#555] rounded-lg p-4 transition-all duration-200 bg-[#161616] cursor-pointer">
+                        <input type="file" id="qrUpload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <div class="text-center">
+                            <span id="qrStatus" class="text-xs text-gray-400">Drag & drop or Click to upload QR Code</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Copy Input -->
+                <div>
+                    <label for="customText" class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-2">3. Display Copy (Bottom Line)</label>
+                    <input type="text" id="customText" value="SCAN FOR PRIVATE ENTRY" class="w-full bg-[#181818] border border-[#333] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors uppercase tracking-wider">
+                </div>
+
+                <!-- Ambient Glow Settings -->
+                <div>
+                    <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-2">4. Motion & Styling Effects</label>
+                    <div class="flex items-center space-x-3 bg-[#181818] p-3 rounded border border-[#2a2a2a]">
+                        <input type="checkbox" id="toggleGlow" checked class="w-4 h-4 accent-white rounded border-[#444] bg-[#111]">
+                        <label for="toggleGlow" class="text-xs text-gray-300 select-none cursor-pointer">Enable Premium Silver Ambient Glow</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Utility Buttons -->
+        <div class="mt-8 pt-6 border-t border-[#222] space-y-3">
+            <button id="btnFullscreen" class="w-full bg-white hover:bg-gray-100 text-black text-xs font-medium uppercase tracking-widest py-3 px-4 rounded transition-colors flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                <span>Launch Fullscreen Kiosk</span>
+            </button>
+            <button id="btnExport" class="w-full bg-[#222] hover:bg-[#333] border border-[#444] text-white text-xs font-medium uppercase tracking-widest py-3 px-4 rounded transition-all flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                <span>Export 1080x1920 PNG</span>
+            </button>
+            <div class="text-center">
+                <span class="text-[10px] text-gray-500">Double-tap anywhere in Fullscreen mode to exit.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DISPLAY SCREEN PREVIEW CONTAINER (Right Side) -->
+    <div class="flex-1 flex items-center justify-center p-4 md:p-8 relative bg-[#090909]">
+        
+        <!-- Live Scaled Preview Frame (Locks exactly to 9:16 aspect ratio) -->
+        <div class="w-full max-w-[380px] md:max-w-[420px] aspect-[9/16] bg-black shadow-2xl shadow-black border border-[#222] rounded-xl overflow-hidden relative flex flex-col items-center justify-between py-12 px-8" id="previewFrame">
+            
+            <!-- Absolute Animated Glow behind QR -->
+            <div id="ambientGlowElement" class="absolute w-[280px] h-[280px] rounded-full ambient-glow top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+
+            <!-- Header Section (Brand Logo/Name) -->
+            <div class="w-full flex flex-col items-center z-10 text-center mb-4">
+                <div id="logoContainer" class="h-20 max-w-[180px] flex items-center justify-center mb-2">
+                    <!-- Default Minimalist SVG Logo Placeholder -->
+                    <div id="logoPlaceholder" class="flex flex-col items-center">
+                        <span class="text-xs font-light uppercase tracking-[0.25em] text-white">KNU ELEMENT</span>
+                        <span class="text-[9px] font-light uppercase tracking-[0.4em] text-gray-400 mt-1">PRODUCTIONS</span>
+                    </div>
+                    <img id="logoImg" class="hidden h-full w-full object-contain" alt="Brand Logo">
+                </div>
+                <!-- Subtle design separator line -->
+                <div class="w-8 h-[1px] bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+            </div>
+
+            <!-- Middle Section (Custom QR Code Frame) -->
+            <div class="w-full flex flex-col items-center justify-center z-10 flex-1 my-4">
+                <div class="relative p-4 rounded-xl border border-[#222] bg-[#000]/60 backdrop-blur-md w-[190px] h-[190px] flex items-center justify-center shadow-2xl shadow-black">
+                    <!-- Soft Inner Border Details for Premium Tech Feel -->
+                    <div class="absolute inset-1 border border-[#161616] rounded-lg pointer-events-none"></div>
+                    
+                    <!-- Default Elegant Mock QR Code (Saves user having to create one immediately) -->
+                    <div id="qrPlaceholder" class="w-full h-full opacity-80 flex flex-col items-center justify-center">
+                        <svg class="w-full h-full text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v2h-3v-2zm-2 2h2v2h-2v-2zm2 2h3v3h-3v-3zm-2-2h2v2h-2v-2zm-2 2h2v2h-2v-2zm2-4h2v2h-2v-2zm-4 0h2v2h-2v-2zm-2 2h2v2h-2v-2z"/>
+                        </svg>
+                        <span class="text-[9px] text-gray-500 uppercase tracking-widest mt-1 absolute bottom-5">Demo Mode</span>
+                    </div>
+                    <img id="qrImg" class="hidden w-full h-full object-contain rounded" alt="QR Code">
+                </div>
+            </div>
+
+            <!-- Bottom Section (Exclusivity Microcopy) -->
+            <div class="w-full text-center z-10 mt-4">
+                <p id="displayText" class="text-[10px] md:text-xs font-light text-[#f5f5f7] letter-spacing-custom text-center transition-all duration-300">
+                    SCAN FOR PRIVATE ENTRY
+                </p>
+                <span class="text-[8px] uppercase tracking-[0.3em] text-gray-600 mt-2 block font-extralight">Knu Element collective</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FULLSCREEN MODAL OVERLAY -->
+    <div id="fullscreenOverlay" class="fixed inset-0 bg-black z-50 hidden cursor-none flex items-center justify-center">
+        <!-- Exact replica of frame, dynamically copied via JS to display borderless full-screen -->
+        <div id="fullscreenTarget" class="w-full h-full max-w-[1080px] max-h-[1920px] bg-black flex flex-col items-center justify-between py-24 px-12 relative overflow-hidden">
+            <!-- Fullscreen contents populated via JS -->
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // DOM Elements
+        const logoUpload = document.getElementById('logoUpload');
+        const logoStatus = document.getElementById('logoStatus');
+        const logoImg = document.getElementById('logoImg');
+        const logoPlaceholder = document.getElementById('logoPlaceholder');
+
+        const qrUpload = document.getElementById('qrUpload');
+        const qrStatus = document.getElementById('qrStatus');
+        const qrImg = document.getElementById('qrImg');
+        const qrPlaceholder = document.getElementById('qrPlaceholder');
+
+        const customText = document.getElementById('customText');
+        const displayText = document.getElementById('displayText');
+
+        const toggleGlow = document.getElementById('toggleGlow');
+        const ambientGlowElement = document.getElementById('ambientGlowElement');
+
+        const previewFrame = document.getElementById('previewFrame');
+        const btnFullscreen = document.getElementById('btnFullscreen');
+        const btnExport = document.getElementById('btnExport');
+
+        const fullscreenOverlay = document.getElementById('fullscreenOverlay');
+        const fullscreenTarget = document.getElementById('fullscreenTarget');
+
+        // State Variables
+        let logoSrc = '';
+        let qrSrc = '';
+
+        // Handle Logo Upload and Preview Integration
+        logoUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    logoSrc = event.target.result;
+                    logoImg.src = logoSrc;
+                    logoImg.classList.remove('hidden');
+                    logoPlaceholder.classList.add('hidden');
+                    logoStatus.innerText = "Logo Loaded Successfully";
+                    logoStatus.classList.add('text-green-400');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle QR Code Upload and Preview Integration
+        qrUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    qrSrc = event.target.result;
+                    qrImg.src = qrSrc;
+                    qrImg.classList.remove('hidden');
+                    qrPlaceholder.classList.add('hidden');
+                    qrStatus.innerText = "QR Code Loaded Successfully";
+                    qrStatus.classList.add('text-green-400');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Live Text Update handler
+        customText.addEventListener('input', function(e) {
+            const text = e.target.value.toUpperCase();
+            displayText.innerText = text || 'SCAN FOR PRIVATE ENTRY';
+        });
+
+        // Toggle Pulsing Ambient Glow Animation
+        toggleGlow.addEventListener('change', function(e) {
+            if (e.target.checked) {
+                ambientGlowElement.classList.add('ambient-glow');
+                ambientGlowElement.style.opacity = '1';
+            } else {
+                ambientGlowElement.classList.remove('ambient-glow');
+                ambientGlowElement.style.opacity = '0';
+            }
+        });
+
+        // Launch Tablet Fullscreen Kiosk Mode
+        btnFullscreen.addEventListener('click', function() {
+            // Setup Fullscreen container layout exactly cloned from configured states
+            fullscreenTarget.innerHTML = `
+                <!-- Background ambient glow loop -->
+                <div class="absolute w-[600px] h-[600px] rounded-full ${toggleGlow.checked ? 'ambient-glow' : ''} top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+                
+                <!-- Fullscreen Header -->
+                <div class="w-full flex flex-col items-center z-10 text-center">
+                    <div class="h-32 max-w-[320px] flex items-center justify-center mb-4">
+                        ${logoSrc ? `<img src="${logoSrc}" class="h-full w-full object-contain" />` : `
+                            <div class="flex flex-col items-center">
+                                <span class="text-3xl font-light uppercase tracking-[0.25em] text-white">KNU ELEMENT</span>
+                                <span class="text-sm font-light uppercase tracking-[0.4em] text-gray-400 mt-2">PRODUCTIONS</span>
+                            </div>
+                        `}
+                    </div>
+                    <div class="w-16 h-[1px] bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+                </div>
+
+                <!-- Fullscreen QR Code Space -->
+                <div class="w-full flex flex-col items-center justify-center z-10 flex-1">
+                    <div class="relative p-8 rounded-2xl border border-[#222] bg-[#000]/70 backdrop-blur-md w-[380px] h-[380px] flex items-center justify-center shadow-[0_0_100px_rgba(0,0,0,0.9)]">
+                        <div class="absolute inset-2 border border-[#161616] rounded-xl pointer-events-none"></div>
+                        ${qrSrc ? `<img src="${qrSrc}" class="w-full h-full object-contain rounded-lg" />` : `
+                            <div class="w-full h-full opacity-80 flex flex-col items-center justify-center">
+                                <svg class="w-3/4 h-3/4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v2h-3v-2zm-2 2h2v2h-2v-2zm2 2h3v3h-3v-3zm-2-2h2v2h-2v-2zm-2 2h2v2h-2v-2zm2-4h2v2h-2v-2zm-4 0h2v2h-2v-2zm-2 2h2v2h-2v-2z"/>
+                                </svg>
+                                <span class="text-xs text-gray-500 uppercase tracking-widest mt-2 absolute bottom-8">Demo QR Frame</span>
+                            </div>
+                        `}
+                    </div>
+                </div>
+
+                <!-- Fullscreen Footer -->
+                <div class="w-full text-center z-10">
+                    <p class="text-lg md:text-xl font-light text-[#f5f5f7] tracking-[0.25em] text-center uppercase">
+                        ${customText.value || 'SCAN FOR PRIVATE ENTRY'}
+                    </p>
+                    <span class="text-xs uppercase tracking-[0.35em] text-gray-500 mt-4 block font-extralight">Knu Element collective</span>
+                </div>
+            `;
+
+            // Open Fullscreen Interface
+            fullscreenOverlay.classList.remove('hidden');
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.warn("Standard browser fullscreen was blocked by iframe security policy. Falling back to clean window-level simulated fullscreen.", err);
+                });
+            }
+        });
+
+        // Double Click to Exit Kiosk/Fullscreen Mode
+        fullscreenOverlay.addEventListener('dblclick', function() {
+            if (document.exitFullscreen && document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            }
+            fullscreenOverlay.classList.add('hidden');
+        });
+
+        // Exit handler if closed via standard keyboard controls (Esc Key)
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement) {
+                fullscreenOverlay.classList.add('hidden');
+            }
+        });
+
+        // Render & Export Exact 1080x1920 High-Res PNG File
+        btnExport.addEventListener('click', function() {
+            btnExport.disabled = true;
+            btnExport.innerText = "Rendering Visual...";
+
+            // Create temporary high-res rendering div offscreen to guarantee 1080x1920 size boundaries
+            const renderTarget = document.createElement('div');
+            renderTarget.style.width = '1080px';
+            renderTarget.style.height = '1920px';
+            renderTarget.style.position = 'fixed';
+            renderTarget.style.top = '-9999px';
+            renderTarget.style.left = '-9999px';
+            renderTarget.style.display = 'flex';
+            renderTarget.style.flexDirection = 'column';
+            renderTarget.style.alignItems = 'center';
+            renderTarget.style.justifyContent = 'space-between';
+            renderTarget.style.padding = '120px 80px';
+            renderTarget.style.backgroundColor = '#000000';
+            renderTarget.style.color = '#f5f5f7';
+            renderTarget.style.boxSizing = 'border-box';
+            renderTarget.style.zIndex = '-999';
+
+            renderTarget.innerHTML = `
+                <!-- Soft static background glow mimicking loop midpoint -->
+                <div style="position: absolute; width: 800px; height: 800px; border-radius: 50%; background: ${toggleGlow.checked ? 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0) 75%)' : 'none'}; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 0;"></div>
+                
+                <!-- Export Header -->
+                <div style="width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; z-index: 10;">
+                    <div style="height: 140px; width: 400px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                        ${logoSrc ? `<img src="${logoSrc}" style="height: 100%; width: 100%; object-fit: contain;" />` : `
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <span style="font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 200; letter-spacing: 0.25em; text-transform: uppercase; color: #ffffff;">KNU ELEMENT</span>
+                                <span style="font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 300; letter-spacing: 0.4em; text-transform: uppercase; color: #a1a1aa; margin-top: 12px;">PRODUCTIONS</span>
+                            </div>
+                        `}
+                    </div>
+                    <div style="width: 100px; height: 1px; background: linear-gradient(to right, transparent, #4b5563, transparent);"></div>
+                </div>
+
+                <!-- Export QR Space -->
+                <div style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; flex-grow: 1;">
+                    <div style="position: relative; padding: 40px; border-radius: 32px; border: 1px solid #222222; background-color: rgba(0, 0, 0, 0.85); width: 480px; height: 480px; display: flex; align-items: center; justify-content: center; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95);">
+                        <div style="position: absolute; top: 12px; left: 12px; right: 12px; bottom: 12px; border: 1px solid #161616; border-radius: 20px; pointer-events: none;"></div>
+                        ${qrSrc ? `<img src="${qrSrc}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;" />` : `
+                            <div style="width: 100%; height: 100%; opacity: 0.8; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <svg style="width: 70%; height: 70%; color: #4b5563;" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v2h-3v-2zm-2 2h2v2h-2v-2zm2 2h3v3h-3v-3zm-2-2h2v2h-2v-2zm-2 2h2v2h-2v-2zm2-4h2v2h-2v-2zm-4 0h2v2h-2v-2zm-2 2h2v2h-2v-2z"/>
+                                </svg>
+                                <span style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.2em; margin-top: 16px; position: absolute; bottom: 35px;">DEMO QR FRAME</span>
+                            </div>
+                        `}
+                    </div>
+                </div>
+
+                <!-- Export Footer -->
+                <div style="width: 100%; text-align: center; z-index: 10;">
+                    <p style="font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 300; letter-spacing: 0.25em; color: #f5f5f7; margin-bottom: 24px; text-transform: uppercase;">
+                        ${customText.value || 'SCAN FOR PRIVATE ENTRY'}
+                    </p>
+                    <span style="font-family: 'Montserrat', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 0.35em; color: #4b5563; font-weight: 200;">Knu Element collective</span>
+                </div>
+            `;
+
+            document.body.appendChild(renderTarget);
+
+            // Trigger HTML2Canvas capturing sequence
+            html2canvas(renderTarget, {
+                useCORS: true,
+                allowTaint: true,
+                scale: 1, // Capture exact target dimensions (1080x1920)
+                backgroundColor: '#000000'
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `knu_element_display_1080x1920.png`;
+                link.href = imgData;
+                link.click();
+
+                // Clean up DOM and reset export button status
+                document.body.removeChild(renderTarget);
+                btnExport.disabled = false;
+                btnExport.innerText = "Export 1080x1920 PNG";
+            }).catch(err => {
+                console.error("Canvas export failed:", err);
+                alert("Failed to export image. Please try again or use the Fullscreen mode to screenshot.");
+                btnExport.disabled = false;
+                btnExport.innerText = "Export 1080x1920 PNG";
+            });
+        });
+
+    </script>
+</body>
+</html>
